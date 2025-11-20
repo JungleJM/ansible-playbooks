@@ -45,16 +45,19 @@
     vm_disk: 12
 
   tasks:
-    - name: Check for Debian 13 ISO locally
-      ansible.builtin.stat:
-        path: "/var/lib/vz/template/iso/{{ debian_iso_name }}"
-      register: iso_file
-
+    - name: Ensure ISO directory exists on Proxmox host
+      ansible.builtin.file:
+        path: "/var/lib/vz/template/iso"
+        state: directory
+        mode: '0755'
+      delegate_to: "{{ pve_api_host }}"
+    
     - name: Download latest Debian 13 ISO if missing
       ansible.builtin.get_url:
         url: "{{ debian_iso_url }}"
         dest: "/var/lib/vz/template/iso/{{ debian_iso_name }}"
         mode: '0644'
+      delegate_to: "{{ pve_api_host }}"
       when: not iso_file.stat.exists
 
     - name: Create VM
