@@ -59,7 +59,7 @@
       delegate_to: "{{ pve_api_host }}"
       when: not iso_file.stat.exists
 
-    - name: Create VM
+    - name: Create Debian cloud VM (minimal working)
       community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
@@ -70,39 +70,22 @@
         cores: "{{ vm_cores }}"
         memory: "{{ vm_ram }}"
         scsihw: virtio-scsi-pci
+        sata:
+          0: "{{ storage }}:12"
         ide:
-          2: "{{ iso_storage }}:iso/{{ debian_iso_name }},media=cdrom"
-        sata: {}
-        ostype: l26
-        boot: c
-        bootdisk: scsi0
-        disks:
-          - slot: 0
-            size: "{{ vm_disk }}"
-            storage: "{{ storage }}"
-            type: scsi
-            format: qcow2
+          2: "{{ storage }}:cloudinit"
         net:
           0:
             model: virtio
             bridge: vmbr0
-        agent: True
-        onboot: False
-        hotplug: network,disk,usb
         ciuser: "{{ username }}"
         cipassword: "{{ password }}"
         ipconfig:
           0:
             ip: "{{ vm_ipv4 }}/24"
             gw: "{{ vm_gw }}"
-        cloudinit: True
+        ostype: l26
         state: present
-      register: newvm
-
-    - name: Reset cloud-init drive for static network config
-      ansible.builtin.command:
-        cmd: "qm cloudinit reset {{ vmid }} --force"
-      delegate_to: "{{ pve_api_host }}"
 
     - name: Start the VM
       community.general.proxmox_kvm:
