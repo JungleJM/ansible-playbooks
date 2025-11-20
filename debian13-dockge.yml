@@ -2,6 +2,23 @@
 - name: Create Debian 13 Proxmox VM with Cloud-Init, Docker, Dockge
   hosts: localhost
   gather_facts: no
+  
+  vars_prompt:
+    - name: "pve_api_host"
+      prompt: "Enter your Proxmox API host"
+    - name: "pve_api_user"
+      prompt: "Enter your Proxmox API user"
+    - name: "pve_api_password"
+      prompt: "Enter your Proxmox API password"
+      private: yes
+    - name: "vmid"
+      prompt: "Enter the VMID to use"
+    - name: "username"
+      prompt: "VM username"
+    - name: "password"
+      prompt: "VM user password"
+
+  
   vars:
     # Provide these as extra vars or edit directly
     pve_api_host: "pve.example.com"
