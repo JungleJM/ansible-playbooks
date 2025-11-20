@@ -45,12 +45,11 @@
     vm_disk: 12
 
   tasks:
-    - name: Ensure ISO directory exists on Proxmox host
-      ansible.builtin.file:
-        path: "/var/lib/vz/template/iso"
-        state: directory
-        mode: '0755'
+    - name: Check for Debian 13 ISO on Proxmox host
+      ansible.builtin.stat:
+        path: "/var/lib/vz/template/iso/{{ debian_iso_name }}"
       delegate_to: "{{ pve_api_host }}"
+      register: iso_file
     
     - name: Download latest Debian 13 ISO if missing
       ansible.builtin.get_url:
