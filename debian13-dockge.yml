@@ -59,7 +59,7 @@
       delegate_to: "{{ pve_api_host }}"
       when: not iso_file.stat.exists
 
-    - name: Create Debian cloud VM (minimal working)
+    - name: Create Debian cloud VM (cloud-init compatible)
       community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
@@ -70,22 +70,15 @@
         cores: "{{ vm_cores }}"
         memory: "{{ vm_ram }}"
         scsihw: virtio-scsi-pci
-        sata:
-          0: "{{ storage }}:12"
-        ide:
-          2: "{{ storage }}:cloudinit"
-        net:
-          0:
-            model: virtio
-            bridge: vmbr0
+        scsi0: "{{ storage }}:12"
+        ide2: "{{ storage }}:cloudinit"
+        net0: "virtio,bridge=vmbr0"
         ciuser: "{{ username }}"
         cipassword: "{{ password }}"
-        ipconfig:
-          0:
-            ip: "{{ vm_ipv4 }}/24"
-            gw: "{{ vm_gw }}"
+        ipconfig0: "ip={{ vm_ipv4 }}/24,gw={{ vm_gw }}"
         ostype: l26
         state: present
+
 
     - name: Start the VM
       community.general.proxmox_kvm:
