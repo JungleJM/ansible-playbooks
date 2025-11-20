@@ -29,7 +29,7 @@
     pve_api_host: "pve.example.com"
     pve_api_user: "root@pam"
     pve_api_password: "changeme"
-    node: "pve"
+    node: "carondelet"
     storage: "local-lvm"
     iso_storage: "local"
     debian_iso_name: "debian-13.0.0-amd64-netinst.iso"
