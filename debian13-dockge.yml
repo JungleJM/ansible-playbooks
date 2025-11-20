@@ -28,7 +28,7 @@
     storage: "local-lvm"
     iso_storage: "local"
     debian_iso_name: "debian-13.0.0-amd64-netinst.iso"
-    debian_iso_url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-nocloud-amd64.qcow2"
+    debian_iso_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
     vmid: "120"                 # <-- set this per deployment!
     vm_name: "debian13-cloud-{{ vmid }}"
     username: "myuser"
