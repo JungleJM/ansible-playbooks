@@ -6,17 +6,22 @@
   vars_prompt:
     - name: "pve_api_host"
       prompt: "Enter your Proxmox API host"
+      private: no
     - name: "pve_api_user"
       prompt: "Enter your Proxmox API user"
+      private: no
     - name: "pve_api_password"
       prompt: "Enter your Proxmox API password"
       private: yes
     - name: "vmid"
       prompt: "Enter the VMID to use"
+      private: no
     - name: "username"
       prompt: "VM username"
+      private: no
     - name: "password"
       prompt: "VM user password"
+      private: no
 
   
   vars:
