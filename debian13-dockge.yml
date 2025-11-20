@@ -1,0 +1,122 @@
+---
+- name: Create Debian 13 Proxmox VM with Cloud-Init, Docker, Dockge
+  hosts: localhost
+  gather_facts: no
+  vars:
+    # Provide these as extra vars or edit directly
+    pve_api_host: "pve.example.com"
+    pve_api_user: "root@pam"
+    pve_api_password: "changeme"
+    node: "pve"
+    storage: "local-lvm"
+    iso_storage: "local"
+    debian_iso_name: "debian-13.0.0-amd64-netinst.iso"
+    debian_iso_url: "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-13.0.0-amd64-netinst.iso"
+    vmid: "120"                 # <-- set this per deployment!
+    vm_name: "debian13-cloud-{{ vmid }}"
+    username: "myuser"
+    password: "mypassword"
+    vm_ipv4: "192.168.50.{{ vmid }}"
+    vm_gw: "192.168.50.1"
+    vm_ram: 2048
+    vm_cores: 2
+    vm_disk: 12
+
+  tasks:
+    - name: Check for Debian 13 ISO locally
+      ansible.builtin.stat:
+        path: "/var/lib/vz/template/iso/{{ debian_iso_name }}"
+      register: iso_file
+
+    - name: Download latest Debian 13 ISO if missing
+      ansible.builtin.get_url:
+        url: "{{ debian_iso_url }}"
+        dest: "/var/lib/vz/template/iso/{{ debian_iso_name }}"
+        mode: '0644'
+      when: not iso_file.stat.exists
+
+    - name: Create VM
+      community.general.proxmox_kvm:
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
+        api_password: "{{ pve_api_password }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        name: "{{ vm_name }}"
+        cores: "{{ vm_cores }}"
+        memory: "{{ vm_ram }}"
+        scsihw: virtio-scsi-pci
+        ide:
+          2: "{{ iso_storage }}:iso/{{ debian_iso_name }},media=cdrom"
+        sata: {}
+        ostype: l26
+        boot: c
+        bootdisk: scsi0
+        disks:
+          - slot: 0
+            size: "{{ vm_disk }}"
+            storage: "{{ storage }}"
+            type: scsi
+            format: qcow2
+        net:
+          0:
+            model: virtio
+            bridge: vmbr0
+        agent: True
+        onboot: False
+        hotplug: network,disk,usb
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        ipconfig:
+          0:
+            ip: "{{ vm_ipv4 }}/24"
+            gw: "{{ vm_gw }}"
+        cloudinit: True
+        state: present
+      register: newvm
+
+    - name: Reset cloud-init drive for static network config
+      ansible.builtin.command:
+        cmd: "qm cloudinit reset {{ vmid }} --force"
+      delegate_to: "{{ pve_api_host }}"
+
+    - name: Start the VM
+      community.general.proxmox_kvm:
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
+        api_password: "{{ pve_api_password }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: started
+
+    - name: Wait for SSH
+      ansible.builtin.wait_for:
+        host: "{{ vm_ipv4 }}"
+        port: 22
+        timeout: 240
+
+    - name: Run apt update & upgrade
+      ansible.builtin.shell: |
+        sudo apt update && sudo apt upgrade -y
+      args:
+        executable: /bin/bash
+      become: yes
+      become_user: "{{ username }}"
+      delegate_to: "{{ vm_ipv4 }}"
+
+    - name: Install Docker
+      ansible.builtin.shell: |
+        curl -fsSL https://get.docker.com | sh
+      args:
+        executable: /bin/bash
+      become: yes
+      become_user: "{{ username }}"
+      delegate_to: "{{ vm_ipv4 }}"
+
+    - name: Install Dockge
+      ansible.builtin.git:
+        repo: 'https://github.com/louislam/dockge.git'
+        dest: '/opt/dockge'
+      become: yes
+      become_user: "{{ username }}"
+      delegate_to: "{{ vm_ipv4 }}"
