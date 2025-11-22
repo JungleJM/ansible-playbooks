@@ -41,7 +41,7 @@
         api_user: "{{ pve_api_user }}"
         api_password: "{{ pve_api_password }}"
         node: "{{ node }}"
-        vmid: "{{ vmid }}"
+        vmid: "{{ template_vmid }}"
         clone: "{{ template_vmid }}"
         name: "{{ vm_name }}"
         full: true
