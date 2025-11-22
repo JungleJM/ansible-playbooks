@@ -38,6 +38,7 @@
     - name: Debug values before clone
       debug:
         msg: "Cloning from {{ template_vmid }} to {{ vmid }}"
+        
     - name: Clone Debian 12 template and set cloud-init params
       community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
@@ -48,6 +49,7 @@
         clone: "{{ template_vmid }}"
         name: "{{ vm_name }}"
         full: true
+        storage: "{{ storage }}"
         memory: "{{ vm_ram }}"
         cores: "{{ vm_cores }}"
         ciuser: "{{ username }}"
