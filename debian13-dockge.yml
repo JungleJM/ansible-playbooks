@@ -48,7 +48,7 @@
         memory: "{{ vm_ram }}"
         cores: "{{ vm_cores }}"
         state: present
-
+    
     - name: Set Proxmox cloud-init params
       community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
@@ -62,8 +62,9 @@
           "0":
             ip: "{{ vm_ipv4 }}"
             gw: "{{ vm_gw }}"
-        state: present
         update: true
+        state: present
+
 
     - name: Start the VM
       community.general.proxmox_kvm:
