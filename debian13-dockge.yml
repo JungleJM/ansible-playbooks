@@ -39,7 +39,7 @@
       debug:
         msg: "Cloning from {{ template_vmid }} to {{ vmid }}"
         
-    - name: Clone Debian 12 template and set cloud-init params
+    - name: Clone Debian 12 template
       community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
@@ -50,8 +50,6 @@
         name: "{{ vm_name }}"
         full: true
         storage: "{{ storage }}"
-        memory: "{{ vm_ram }}"
-        cores: "{{ vm_cores }}"
         ciuser: "{{ username }}"
         cipassword: "{{ password }}"
         ipconfig:
@@ -59,6 +57,20 @@
             ip: "{{ vm_ipv4 }}"
             gw: "{{ vm_gw }}"
         state: present
+
+    - name: Set VM resources after clone
+      community.general.proxmox_kvm:
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
+        api_password: "{{ pve_api_password }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        memory: "{{ vm_ram }}"
+        cores: "{{ vm_cores }}"
+        update: true
+        state: present
+
+
 
     - name: Start the VM
       community.general.proxmox_kvm:
