@@ -36,7 +36,7 @@
 
   tasks:
     - name: Clone Debian 12 template
-       community.general.proxmox_kvm:
+      community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
         api_password: "{{ pve_api_password }}"
