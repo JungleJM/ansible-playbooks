@@ -56,7 +56,7 @@
           "0":
             ip: "{{ vm_ipv4 }}"
             gw: "{{ vm_gw }}"
-        state: present
+        state: clone
 
     - name: Set VM resources after clone
       community.general.proxmox_kvm:
