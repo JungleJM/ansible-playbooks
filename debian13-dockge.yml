@@ -50,16 +50,20 @@
         state: present
 
     - name: Set Proxmox cloud-init params
-      community.general.proxmox_cloud_init:
+      community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
         api_password: "{{ pve_api_password }}"
         node: "{{ node }}"
         vmid: "{{ vmid }}"
-        user: "{{ username }}"
-        password: "{{ password }}"
-        ip: "{{ vm_ipv4 }}"
-        gw: "{{ vm_gw }}"
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        ipconfig:
+          "0":
+            ip: "{{ vm_ipv4 }}"
+            gw: "{{ vm_gw }}"
+        state: present
+        update: true
 
     - name: Start the VM
       community.general.proxmox_kvm:
