@@ -63,6 +63,8 @@
             ip: "{{ vm_ipv4 }}"
             gw: "{{ vm_gw }}"
         update: true
+        state: present
+
 
     - name: Start the VM
       community.general.proxmox_kvm:
