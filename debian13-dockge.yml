@@ -35,36 +35,25 @@
     vm_gw: "192.168.50.1"
 
   tasks:
-    - name: Clone Debian 12 template
-      community.general.proxmox_kvm:
-        api_host: "{{ pve_api_host }}"
-        api_user: "{{ pve_api_user }}"
-        api_password: "{{ pve_api_password }}"
-        node: "{{ node }}"
-        vmid: "{{ template_vmid }}"
-        clone: "{{ template_vmid }}"
-        name: "{{ vm_name }}"
-        full: true
-        memory: "{{ vm_ram }}"
-        cores: "{{ vm_cores }}"
-        state: present
-    
-    - name: Set Proxmox cloud-init params
+    - name: Clone Debian 12 template and set cloud-init params
       community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
         api_password: "{{ pve_api_password }}"
         node: "{{ node }}"
         vmid: "{{ vmid }}"
+        clone: "{{ template_vmid }}"
+        name: "{{ vm_name }}"
+        full: true
+        memory: "{{ vm_ram }}"
+        cores: "{{ vm_cores }}"
         ciuser: "{{ username }}"
         cipassword: "{{ password }}"
         ipconfig:
           "0":
             ip: "{{ vm_ipv4 }}"
             gw: "{{ vm_gw }}"
-        update: true
         state: present
-
 
     - name: Start the VM
       community.general.proxmox_kvm:
