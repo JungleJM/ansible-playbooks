@@ -21,7 +21,7 @@
     node: "carondelet"
     storage: "local-lvm"
     template_vmid: 198
-    pve_api_host: 192.168.50.201
+    pve_api_host: "192.168.50.201"
     pve_api_user: "root@pam"
     vm_name: "debian12-cloud-{{ vmid }}"
     vm_ram: 2048
