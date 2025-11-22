@@ -35,7 +35,7 @@
     vm_gw: "192.168.50.1"
 
   tasks:
-     - name: Clone Debian 12 template
+    - name: Clone Debian 12 template
        community.general.proxmox_kvm:
         api_host: "{{ pve_api_host }}"
         api_user: "{{ pve_api_user }}"
